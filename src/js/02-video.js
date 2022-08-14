@@ -19,4 +19,6 @@ function onTimeUpdate(data) {
   localStorage.setItem('playtime', data.seconds);
 }
 
-player.setCurrentTime(localStorage.getItem('playtime'));
+if (localStorage.getItem('playtime')) {
+  player.setCurrentTime(localStorage.getItem('playtime'));
+}

@@ -1,38 +1,42 @@
 const throttle = require('lodash.throttle');
 
-const formRef = document.querySelector('.feedback-form');
-const emailRef = document.querySelector('[type="email"]');
-const messageRef = document.querySelector('[name="message"]');
+const ref = {
+  form: document.querySelector('.feedback-form'),
+  email: document.querySelector('[type="email"]'),
+  message: document.querySelector('[name="message"]'),
+};
+
 const savedInputs = localStorage.getItem('feedback-form-state');
-const formValues = {};
+const inputValues = {};
+
+ref.form.addEventListener('input', throttle(onInput, 500));
+ref.form.addEventListener('submit', onSubmit);
 
 if (savedInputs) {
-  fillInputValue();
+  populateInput();
 }
 
-formRef.addEventListener('input', onFormInput);
-formRef.addEventListener('submit', throttle(onFormSubmit, 500));
-
-function onFormInput(evt) {
-  formValues[evt.target.getAttribute('name')] = evt.target.value;
-
-  const formValuesJSON = JSON.stringify(formValues);
-
-  localStorage.setItem('feedback-form-state', formValuesJSON);
+function onInput(evt) {
+  inputValues[evt.target.getAttribute('name')] = evt.target.value;
+  if (!inputValues[evt.target.getAttribute('name')]) {
+    delete inputValues[evt.target.getAttribute('name')];
+  }
+  const inputValuesJSON = JSON.stringify(inputValues);
+  localStorage.setItem('feedback-form-state', inputValuesJSON);
 }
 
-function onFormSubmit(evt) {
+function onSubmit(evt) {
   evt.preventDefault();
-  console.log(`email: ${emailRef.value}, message: ${messageRef.value}`);
+  console.log(`email: ${ref.email.value}, message: ${ref.message.value}`);
   evt.currentTarget.reset();
   localStorage.removeItem('feedback-form-state');
 }
 
-function fillInputValue() {
+function populateInput() {
   if (JSON.parse(savedInputs).hasOwnProperty('email')) {
-    emailRef.value = JSON.parse(savedInputs).email;
+    ref.email.value = JSON.parse(savedInputs).email;
   }
   if (JSON.parse(savedInputs).hasOwnProperty('message')) {
-    messageRef.value = JSON.parse(savedInputs).message;
+    ref.message.value = JSON.parse(savedInputs).message;
   }
 }
